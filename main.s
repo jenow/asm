@@ -38,14 +38,14 @@ _start:
   mov ecx, esp
   int 0x80
 
+  cmp eax, 0
+  jl .fail
+
   mov eax, 4
   mov ebx, dword[socket]
   mov ecx, str
   mov edx, strlen
   int 0x80
-
-  cmp eax, 0
-  jl .fail
 
   mov esp, ebp
   pop ebp
