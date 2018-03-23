@@ -1,5 +1,5 @@
 section .data
-  str: db "debug", 10
+  str: db "GET /_serverInfo HTTP/1.1", 10, "HOST: localhost", 10, 10
   strlen: equ $-str
   buff_len: equ 128
 
