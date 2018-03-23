@@ -1,10 +1,12 @@
 section .data
   str: db "debug", 10
   strlen: equ $-str
+  buff_len: equ 128
 
 section .bss
   socket: resd   1
   socket_addr: resd    2
+  buff: resb buff_len
 
 section .text
 
@@ -22,6 +24,8 @@ _start:
   mov ebx, 1
   mov ecx, esp
   int 0x80
+
+  add esp, 12
 
   mov dword[socket], eax
 
@@ -46,6 +50,28 @@ _start:
   mov ecx, str
   mov edx, strlen
   int 0x80
+
+.loop:
+  mov eax, 3
+  mov ebx, dword[socket]
+  mov ecx, buff
+  mov edx, 128
+  int 0x80
+
+  mov eax, 4
+  mov ebx, 1
+  mov ecx, buff
+  mov edx, 128
+  int 0x80
+
+  mov ecx, 0
+.bzero:
+  add ecx, 1
+  mov byte[buff + ecx], 0
+  cmp ecx, buff_len
+  jne .bzero
+
+  jmp .loop
 
   mov esp, ebp
   pop ebp
