@@ -10,13 +10,6 @@ section .text
 
 global _start
 
-.print:
-  mov eax, 4
-  mov ebx, 1
-  mov ecx, str
-  mov edx, strlen
-  int 0x80
-
 _start:
   push ebp
   mov ebp, esp
@@ -32,8 +25,8 @@ _start:
 
   mov dword[socket], eax
 
-  push dword 0x7F000001
-  push dword 7512
+  push dword 0x00000000
+  push dword 0x2823
   push word 2
   mov [socket_addr], esp
 
@@ -45,14 +38,14 @@ _start:
   mov ecx, esp
   int 0x80
 
-  cmp eax, 0
-  jl .fail
-
   mov eax, 4
   mov ebx, dword[socket]
   mov ecx, str
   mov edx, strlen
   int 0x80
+
+  cmp eax, 0
+  jl .fail
 
   mov esp, ebp
   pop ebp
@@ -75,3 +68,11 @@ _start:
   mov eax, 1
   mov ebx, 0
   int 0x80
+
+.print:
+  mov eax, 4
+  mov ebx, 1
+  mov ecx, str
+  mov edx, strlen
+  int 0x80
+  ret
