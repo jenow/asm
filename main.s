@@ -30,7 +30,7 @@ _start:
   mov dword[socket], eax
 
   push dword 0x00000000
-  push dword 0x2823
+  push dword 0x581D
   push word 2
   mov [socket_addr], esp
 
@@ -64,12 +64,10 @@ _start:
   mov edx, 128
   int 0x80
 
-  mov ecx, 0
-.bzero:
-  add ecx, 1
-  mov byte[buff + ecx], 0
-  cmp ecx, buff_len
-  jne .bzero
+  push dword buff_len
+  push dword buff
+  call bzero
+  add esp, 8
 
   jmp .loop
 
@@ -101,4 +99,23 @@ _start:
   mov ecx, str
   mov edx, strlen
   int 0x80
+  ret
+
+bzero:
+  push ebp
+  mov ebp, esp
+  sub esp, 8
+
+  mov ecx, [ebp + 12]
+  mov edx, [ebp + 8]
+
+.loop:
+  dec ecx
+  cmp ecx, 0
+  jl .ret
+  mov byte[edx + ecx], 0
+  jmp .loop
+.ret:
+  mov esp, ebp
+  pop ebp
   ret
