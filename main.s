@@ -1,12 +1,16 @@
 section .data
   str: db "GET /_serverInfo HTTP/1.1", 10, "HOST: localhost", 10, 10
   strlen: equ $-str
+  temp_file: db "/sys/class/hwmon/hwmon2/temp1_input"
+  temp_file_len: equ $-temp_file
   buff_len: equ 128
 
 section .bss
   socket: resd   1
   socket_addr: resd    2
   buff: resb buff_len
+  temp: resb 6
+  fd: resd 1
 
 section .text
 
@@ -15,6 +19,22 @@ global _start
 _start:
   push ebp
   mov ebp, esp
+
+  mov eax, 5
+  mov ebx, temp_file
+  mov ecx, 0
+  int 0x80
+  mov [fd], eax
+
+  mov eax, 3
+  mov ebx, [fd]
+  mov ecx, temp
+  mov edx, 6
+  int 0x80
+
+  mov eax, 3
+  mov ebx, [fd]
+  int 0x80
 
   push dword 6
   push dword 1
@@ -30,7 +50,7 @@ _start:
   mov dword[socket], eax
 
   push dword 0x00000000
-  push dword 0x581D
+  push dword 0x9210
   push word 2
   mov [socket_addr], esp
 
@@ -44,12 +64,6 @@ _start:
 
   cmp eax, 0
   jl .fail
-
-  mov eax, 4
-  mov ebx, dword[socket]
-  mov ecx, str
-  mov edx, strlen
-  int 0x80
 
 .loop:
   mov eax, 3
@@ -96,8 +110,8 @@ _start:
 .print:
   mov eax, 4
   mov ebx, 1
-  mov ecx, str
-  mov edx, strlen
+  mov ecx, temp
+  mov edx, 6
   int 0x80
   ret
 
